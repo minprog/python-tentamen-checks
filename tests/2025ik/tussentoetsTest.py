@@ -21,7 +21,7 @@ def test_is_sorted (test):
     func = get_function("is_sorted")
     assert no_input_output_in_function(func)
     assert func([1, 2, 3]) == True
-    # assert func([]) == True
+    # assert func([]) == True # niet vermeld in de opdracht
     assert func([3, 2, 1]) == False
     assert func([3, 6, 1, 10]) == False
     assert func([1, 2, 0]) == False
