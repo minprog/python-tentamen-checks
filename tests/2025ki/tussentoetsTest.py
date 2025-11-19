@@ -70,8 +70,8 @@ def test_most_vowely_word (test):
 @test(10)
 def test_select_palindromes (test):
     """5. select_palindromes werkt correct"""
-    assert function_defined_in_module("select_palindromes")
-    func = get_function("select_palindromes")
+    assert function_defined_in_module("select_palindromes", "select_palidromes")
+    func = get_function("select_palindromes", "select_palidromes")
     assert no_input_output_in_function(func)
     assert func(['lepel', 'spoon', 'ada', 'Raar']) == ['lepel', 'ada']
     assert func(['lepel']) == ['lepel']
