@@ -27,8 +27,8 @@ def test_select_not_lower (test):
 @test(10)
 def test_string_picker (test):
     """2. string_picker werkt correct"""
-    assert function_defined_in_module("string_picker")
-    func = get_function("string_picker")
+    assert function_defined_in_module("string_picker", "string_pickers")
+    func = get_function("string_picker", "string_pickers")
     assert no_input_output_in_function(func)
     assert func(['a', 'dd'], [0, 0, 1]) == 'aadd'
     assert func(['a', 'dd'], [1]) == 'dd'
