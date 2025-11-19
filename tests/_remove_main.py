@@ -67,10 +67,6 @@ def remove_syntax_error(test):
         f"   deze functie kan dus niet gecheckt worden"
     )
 
-    # wat het echt doet is het verwijderen van alle code die niet
-    # in een functie staat, maar wel pas vanaf de eerste functie
-    # (zodat dingen als imports en globals wel bewaard blijven mits
-    # ze boven de bovenste functie staan)
     with open(checkpy.file.name, 'w') as f:
         for lineno in range(len(file_contents)):
             if lineno >= def_line and lineno < next_def_line:
