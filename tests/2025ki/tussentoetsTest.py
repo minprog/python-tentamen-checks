@@ -55,8 +55,8 @@ def test_remove_prefix (test):
 @test(10)
 def test_most_vowely_word (test):
     """4. most_vowely_word werkt correct"""
-    assert function_defined_in_module("most_vowely_word", "most_vowely_words")
-    func = get_function("most_vowely_word", "most_vowely_words")
+    assert function_defined_in_module("most_vowely_word", "most_vowely_words", "most_vowels_word")
+    func = get_function("most_vowely_word", "most_vowely_words", "most_vowels_word")
     assert no_input_output_in_function(func)
     assert func('de groene kamer') == 'groene'
     assert func('groene') == 'groene'
@@ -70,8 +70,8 @@ def test_most_vowely_word (test):
 @test(10)
 def test_select_palindromes (test):
     """5. select_palindromes werkt correct"""
-    assert function_defined_in_module("select_palindromes", "select_palidromes")
-    func = get_function("select_palindromes", "select_palidromes")
+    assert function_defined_in_module("select_palindromes", "select_palidromes", "select_palindrome")
+    func = get_function("select_palindromes", "select_palidromes", "select_palindrome")
     assert no_input_output_in_function(func)
     assert func(['lepel', 'spoon', 'ada', 'Raar']) == ['lepel', 'ada']
     assert func(['lepel']) == ['lepel']
