@@ -55,8 +55,8 @@ def test_remove_prefix (test):
 @test(10)
 def test_most_vowely_word (test):
     """4. most_vowely_word werkt correct"""
-    assert function_defined_in_module("most_vowely_word", "parametize", 'parametrize')
-    func = get_function("most_vowely_word", "parametize", 'parametrize')
+    assert function_defined_in_module("most_vowely_word", "most_vowely_words")
+    func = get_function("most_vowely_word", "most_vowely_words")
     assert no_input_output_in_function(func)
     assert func('de groene kamer') == 'groene'
     assert func('groene') == 'groene'
