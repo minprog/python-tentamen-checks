@@ -50,42 +50,51 @@ import subprocess
 @test(11)
 def require_doctests_for_all_functions(test):
     """doctest-overzicht"""
-    p = subprocess.run([sys.executable or 'python3', '-m', 'doctest', '-v', test.fileName], capture_output=True, universal_newlines=True)
+    doctest_output = subprocess.run([sys.executable or 'python3', '-m', 'doctest', '-v', test.fileName], capture_output=True, universal_newlines=True)
+    mypy_output = subprocess.run(['mypy', '--strict', '--ignore-missing-imports', '--disable-error-code=name-defined', test.fileName], capture_output=True, universal_newlines=True)
+    # raise AssertionError(mypy_output.stdout)
     raise AssertionError(
-        doctest_to_table(
-            p.stdout,
+        build_test_type_overview(
+            doctest_report=doctest_output.stdout,
+            mypy_output=mypy_output.stdout,
+            source=static.getSource(),
             module_name="tentamen_deel_2",
-            class_order=["TaskList", "Book", "Library", "Date"]
+            class_order=["TaskList", "Book", "Library", "Date"],
+            include_module_level_functions=True,   # brings back get_all_keys/get_column rows too
         )
+        # doctest_to_table(
+        #     p.stdout,
+        #     module_name="tentamen_deel_2",
+        #     class_order=["TaskList", "Book", "Library", "Date"]
+        # )
     )
 
-
+import ast
 import re
-from typing import List, Dict, Tuple, Optional
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 
 
-def doctest_to_table(
+# -----------------------------
+# 1) Parse doctest summary -> statuses
+# -----------------------------
+
+def parse_doctest_statuses(
     report: str,
     module_name: str,
-    class_order: Optional[List[str]] = None,
-) -> str:
+    include_module_level_functions: bool = True,
+) -> Dict[Tuple[str, str], Dict[str, Optional[bool]]]:
     """
-    Table columns:
-      Class | Method | Is tested | Success
-
-    Rules:
-    - Skip the main module itself.
-    - Ignore module-level functions entirely.
-    - Include class-level items (Method="") and class methods.
-    - If class_order is provided, order classes by that list.
-    - If any class in class_order is missing from doctest items, still include it
-      as a single row: Class=<name>, Method="", Is tested="no", Success="-".
+    Returns: {(class, method): {"tested": bool, "success": Optional[bool]}}
+    - class="" and method="funcname" for module-level functions (if included)
+    - class="Book" method="" for class-level items
+    - class="Book" method="__str__" for methods
+    - module itself is excluded
     """
-
     no_tests_items: List[str] = []
     passed_items: List[str] = []
     failed_items: List[str] = []
-
     lines = report.splitlines()
 
     def gather_block(start_idx: int):
@@ -117,7 +126,6 @@ def doctest_to_table(
         i += 1
 
     def extract_target(s: str) -> str:
-        # "2 tests in tentamen_deel_2.Book.__str__" -> "tentamen_deel_2.Book.__str__"
         m = re.search(r"\bin\s+([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\s*$", s)
         return m.group(1) if m else s
 
@@ -125,7 +133,6 @@ def doctest_to_table(
     failed_targets = [extract_target(x) for x in failed_items]
 
     def split_target(full: str) -> Tuple[str, str]:
-        # skip module itself
         if full == module_name:
             return "", ""
 
@@ -133,15 +140,19 @@ def doctest_to_table(
         if len(parts) < 2:
             return "", ""
 
-        tail = parts[1:]  # drop module prefix
+        tail = parts[1:]  # drop module
 
-        # Only accept class and class members; ignore module-level functions
-        if not tail[0][:1].isupper():
-            return "", ""
+        # class or class.member
+        if tail[0][:1].isupper():
+            cls = tail[0]
+            meth = ".".join(tail[1:]) if len(tail) > 1 else ""
+            return cls, meth
 
-        cls = tail[0]
-        meth = ".".join(tail[1:]) if len(tail) > 1 else ""  # "" means class-level
-        return cls, meth
+        # module-level function
+        if include_module_level_functions:
+            return "", tail[0]
+
+        return "", ""
 
     statuses: Dict[Tuple[str, str], Dict[str, Optional[bool]]] = {}
 
@@ -157,47 +168,215 @@ def doctest_to_table(
 
     for t in no_tests_items:
         set_status(t, tested=False, success=None)
-
     for t in passed_targets:
         set_status(t, tested=True, success=True)
-
     for t in failed_targets:
         set_status(t, tested=True, success=False)
 
-    # ---- Ensure missing specified classes appear as one "not there" row ----
+    return statuses
+
+
+# -----------------------------
+# 2) Parse mypy output -> line diagnostics
+# -----------------------------
+
+
+@dataclass(frozen=True)
+class MypyDiag:
+    file: str
+    line: int
+    kind: str   # "error" | "note" | "warning"
+    msg: str
+    code: str   # e.g. "type-arg", may be ""
+
+def parse_mypy_output(mypy_text: str) -> List[MypyDiag]:
+    """
+    Parses mypy output like:
+      tentamen_deel_2.py:59: error: Function is missing a return type annotation  [no-untyped-def]
+    """
+    diags: List[MypyDiag] = []
+
+    # file:line: kind: message [code]
+    rx = re.compile(
+        r"^(?P<file>[^:]+):(?P<line>\d+):\s*(?P<kind>error|note|warning):\s*"
+        r"(?P<msg>.*?)(?:\s+\[(?P<code>[^\]]+)\])?\s*$",
+        re.IGNORECASE,
+    )
+
+    for raw in mypy_text.splitlines():
+        s = raw.strip()
+        if not s:
+            continue
+        if s.lower().startswith("found ") and " errors " in s.lower():
+            continue
+
+        m = rx.match(s)
+        if not m:
+            continue
+
+        diags.append(MypyDiag(
+            file=m.group("file"),
+            line=int(m.group("line")),
+            kind=m.group("kind").lower(),
+            msg=m.group("msg").strip(),
+            code=(m.group("code") or "").strip(),
+        ))
+
+    return diags
+
+# -----------------------------
+# 3) Map line -> (class, method) using AST
+# -----------------------------
+
+@dataclass
+class DefSpan:
+    cls: str            # "" for module-level function
+    name: str           # function name or "" for class body
+    start: int
+    end: int
+
+class _SpanCollector(ast.NodeVisitor):
+    def __init__(self):
+        self.spans: List[DefSpan] = []
+        self._class_stack: List[str] = []
+
+    def visit_ClassDef(self, node: ast.ClassDef):
+        cls_name = node.name
+        start = getattr(node, "lineno", 1)
+        end = getattr(node, "end_lineno", start)
+        # class body span (to attribute errors inside class body, not inside a method)
+        self.spans.append(DefSpan(cls=cls_name, name="", start=start, end=end))
+
+        self._class_stack.append(cls_name)
+        self.generic_visit(node)
+        self._class_stack.pop()
+
+    def visit_FunctionDef(self, node: ast.FunctionDef):
+        cls = self._class_stack[-1] if self._class_stack else ""
+        start = getattr(node, "lineno", 1)
+        end = getattr(node, "end_lineno", start)
+        self.spans.append(DefSpan(cls=cls, name=node.name, start=start, end=end))
+        self.generic_visit(node)
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef):
+        self.visit_FunctionDef(node)  # treat same
+
+def build_line_owner_map(source: str) -> Dict[int, Tuple[str, str]]:
+    """
+    Returns mapping: line_number -> (class, method)
+      - module-level function: ("", "func")
+      - class method: ("Book", "__str__")
+      - class body (outside any method): ("Book", "")
+      - otherwise: ("", "") (module/global code)
+    """
+    tree = ast.parse(source)
+    collector = _SpanCollector()
+    collector.visit(tree)
+
+    spans = sorted(
+        collector.spans,
+        key=lambda s: (s.start, -(s.end - s.start))  # prefer narrower later via scan below
+    )
+
+    # For each line, choose the narrowest enclosing span (method beats class body).
+    line_to_owner: Dict[int, Tuple[str, str]] = {}
+    max_line = max((getattr(tree, "end_lineno", 1),), default=1)
+
+    # Determine max line from source text if end_lineno missing
+    max_line = max(max_line, source.count("\n") + 1)
+
+    for line in range(1, max_line + 1):
+        owners = [sp for sp in spans if sp.start <= line <= sp.end]
+        if not owners:
+            line_to_owner[line] = ("", "")
+            continue
+        # pick narrowest (smallest span length); if tie, prefer function (name != "")
+        owners.sort(key=lambda sp: ((sp.end - sp.start), 0 if sp.name != "" else 1))
+        best = owners[0]
+        line_to_owner[line] = (best.cls, best.name)
+
+    return line_to_owner
+
+
+# -----------------------------
+# 4) Merge into one table (with ordering and "missing classes" rows)
+# -----------------------------
+
+def format_overview_table(
+    doctest_statuses: Dict[Tuple[str, str], Dict[str, Optional[bool]]],
+    mypy_diags: List[MypyDiag],
+    source: str,
+    class_order: Optional[List[str]] = None,
+    include_module_level_functions: bool = True,
+) -> str:
+    line_owner = build_line_owner_map(source)
+
+    # aggregate mypy diagnostics per (class, method)
+    issues: Dict[Tuple[str, str], List[MypyDiag]] = defaultdict(list)
+    for d in mypy_diags:
+        cls, meth = line_owner.get(d.line, ("", ""))
+        if cls == "" and meth == "" and not include_module_level_functions:
+            continue
+        # if it's module-level global code, we don't show it in this overview
+        if cls == "" and meth == "":
+            continue
+        if cls == "" and meth != "" and not include_module_level_functions:
+            continue
+        issues[(cls, meth)].append(d)
+
+    # build combined keyset
+    combined_keys = set(doctest_statuses.keys()) | set(issues.keys())
+
+    # If class_order is provided, ensure missing classes appear as one row.
     if class_order:
-        present_classes = {cls for (cls, _meth) in statuses.keys()}
+        present_classes = {cls for (cls, _m) in combined_keys if cls}
         for cls in class_order:
             if cls not in present_classes:
-                statuses.setdefault((cls, ""), {"tested": False, "success": None})
+                combined_keys.add((cls, ""))
 
-    # ---- Build rows ----
+    def yesno(x: Optional[bool]) -> str:
+        return "yes" if x else "no"
+
     rows = []
-    for (cls, meth), st in statuses.items():
+    for (cls, meth) in combined_keys:
+        # Skip module itself (already), and optionally module-level functions
+        if cls == "" and meth == "":
+            continue
+        if cls == "" and meth != "" and not include_module_level_functions:
+            continue
+
+        dt = doctest_statuses.get((cls, meth))
+        tested = dt["tested"] if dt and dt["tested"] is not None else False
+        success = dt["success"] if dt else None
+
+        di = issues.get((cls, meth), [])
+        has_mypy = bool([x for x in di if x.kind == "error"]) or bool(di)
+        # You can decide if you only want "error" to count; currently counts any diag (error/note).
+        mypy_count = len(di)
+
         rows.append({
             "Class": cls,
             "Method": meth,
-            "Is tested": "yes" if st["tested"] else "-",
-            "Success": (
-                "v" if st["success"] is True else
-                "x" if st["success"] is False else
-                "-"
-            )
+            # "Is tested": "yes" if tested else "-",
+            "doctest OK": "yes" if success is True else "no" if success is False else "-",
+            "mypy err": str(mypy_count) if mypy_count else '',
         })
 
-    # ---- Sort: class_order first, then remaining classes alphabetically ----
     order_index = {c: i for i, c in enumerate(class_order or [])}
+
     def class_rank(c: str) -> Tuple[int, str]:
+        # Put module-level functions first
+        if c == "":
+            return (-1, "")  # anything smaller than 0
         return (order_index.get(c, len(order_index)), c)
 
     rows.sort(key=lambda r: (
         class_rank(r["Class"]),
-        r["Method"] != "",   # class-level (empty method) first
+        0 if r["Method"] == "" else 1,  # class-level rows first
         r["Method"],
     ))
 
-    # ---- Format table ----
-    headers = ["Class", "Method", "Is tested", "Success"]
+    headers = ["Class", "Method", "doctest OK", "mypy err"]
     widths = {h: len(h) for h in headers}
     for r in rows:
         for h in headers:
@@ -208,14 +387,31 @@ def doctest_to_table(
 
     sep = "-+-".join("-" * widths[h] for h in headers)
 
-    return "\n".join(
-        [fmt_row(dict(zip(headers, headers))), sep] +
-        [fmt_row(r) for r in rows]
+    return "\n".join([fmt_row(dict(zip(headers, headers))), sep] + [fmt_row(r) for r in rows])
+
+
+# -----------------------------
+# Convenience wrapper
+# -----------------------------
+
+def build_test_type_overview(
+    doctest_report: str,
+    mypy_output: str,
+    source: str,
+    module_name: str,
+    class_order: Optional[List[str]] = None,
+    include_module_level_functions: bool = True,
+) -> str:
+    dt = parse_doctest_statuses(
+        doctest_report,
+        module_name=module_name,
+        include_module_level_functions=include_module_level_functions,
     )
-
-
-# Example (your failing-only-functions report):
-# print(doctest_to_table(DOCTEST_OUTPUT, "tentamen_deel_2", ["Book", "Date", "Library", "TaskList"]))
-#
-# This will include 4 rows (one per class) all marked Is tested="no", Success="-"
-# because only module-level functions were present and those are ignored.
+    my = parse_mypy_output(mypy_output)
+    return format_overview_table(
+        doctest_statuses=dt,
+        mypy_diags=my,
+        source=source,
+        class_order=class_order,
+        include_module_level_functions=include_module_level_functions,
+    )
