@@ -64,7 +64,7 @@ def map_functions(source):
     # find all function defs
     defs = []
     for i in range(size):
-        if source[i].startswith('def '):
+        if source[i].startswith('def ') or source[i].startswith('class ') or source[i].startswith('if '):
             defs.append(i)
 
     # make list of all start-end line pairs of functions
@@ -125,5 +125,5 @@ def remove_syntax_errors(test):
     test.description = (
         f"!! syntax error verwijderd in functie(s) !!\n"
         f"{removed_functions_list}\n"
-        f"   deze functie(s) kan dus niet gecheckt worden"
+        f"   deze functie/class/if(s) kan dus niet gecheckt worden"
     )
