@@ -3,28 +3,6 @@ from checkpy import *
 from _forbidden_constructs import module_has_syntax_error
 
 def augment(define_location: int, lines: list[str]) -> tuple[str, int, int]:
-
-        # # lees file via checkpy API, voeg weer \n toe na splitten
-        # file_contents = [f"{x}\n" for x in checkpy.static.getSource().split("\n")]
-
-        # # zoek eerste 'def'-regel boven de foutregel
-        # def_line = None
-        # for i in range(line - 1, -1, -1):
-        #     if file_contents[i].lstrip().startswith("def "):
-        #         def_line = i
-        #         break
-
-        # next_def_line = None
-        # for i in range(line, len(file_contents)):
-        #     if file_contents[i].lstrip().startswith("def "):
-        #         next_def_line = i
-        #         break
-
-        # if next_def_line is None:
-        #     next_def_line = len(file_contents)
-
-
-
     # start with the line that was provided
     start = define_location
 
