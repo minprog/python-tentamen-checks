@@ -40,8 +40,8 @@ def test_check_username (test):
 @test(10)
 def test_select_ordered_words (test):
     """3. select_ordered_words werkt correct"""
-    assert function_defined_in_module("select_ordered_words", "select_orderd_words", "selected_ordered_words")
-    func = get_function("select_ordered_words", "select_orderd_words", "selected_ordered_words")
+    assert function_defined_in_module("select_ordered_words", "select_orderd_words", "selected_ordered_words", "select_ordend_words")
+    func = get_function("select_ordered_words", "select_orderd_words", "selected_ordered_words", "select_ordend_words")
     assert no_input_output_in_function(func)
     assert func(["chimps", "adders", "elephants"]) == ["chimps", "adders"]
     assert func(["elephants", "ohmy"]) == []
