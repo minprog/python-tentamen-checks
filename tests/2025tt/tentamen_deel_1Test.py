@@ -61,8 +61,8 @@ def test_extract_number (test):
 @test(10)
 def test_word_lengths (test):
     """5. word_lengths werkt correct"""
-    assert function_defined_in_module("word_lengths", "word_lengths", "word_length", "select_palindrome")
-    func = get_function("word_lengths", "word_lengths", "word_length", "select_palindrome")
+    assert function_defined_in_module("word_lengths", "word_lenghts", "word_length", "select_palindrome")
+    func = get_function("word_lengths", "word_lenghts", "word_length", "select_palindrome")
     assert no_input_output_in_function(func)
     assert func('Van harte gefeliciteerd!') == [3, 5, 13]
     assert func('Van gefeliciteerd harte!') == [3, 13, 5]
