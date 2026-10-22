@@ -7,6 +7,7 @@ from checkpy import *
 from _pyprog_tools import *
 
 from _catch_syntax_error import remove_syntax_errors
+from _catch_infinite_loops import remove_infinite_loops
 
 # standard checks but without pycodestyle!
 from _python_checks import forbidden_constructs, mypy_strict, doctest
