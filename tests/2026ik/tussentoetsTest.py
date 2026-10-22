@@ -73,7 +73,7 @@ def test_select_by_letter_count (test):
 @test(10)
 def test_hashtags (test):
     """5. hashtags werkt correct"""
-    func = get_defined_function("hashtags")
+    func = get_defined_function("hashtags", "hastags")
     assert no_input_output_in_function(func)
     assert func('ik #hou van #python') == ['hou', 'python']
     assert func('#eerste en #laatste') == ['eerste', 'laatste']
