@@ -57,7 +57,7 @@ def test_count_pairs (test):
 @test(10)
 def test_select_by_letter_count (test):
     """4. select_by_letter_count werkt correct"""
-    func = get_defined_function("select_by_letter_count", "select_by_letter", "select_by_letters_count")
+    func = get_defined_function("select_by_letter_count", "select_by_letter", "select_by_letters_count", "selected_by_letter_count")
     assert no_input_output_in_function(func)
     assert func(['banaan', 'appel', 'aap'], 'a', 2) == ['aap']
     assert func(['banaan', 'appel', 'aap'], 'a', 3) == ['banaan']
