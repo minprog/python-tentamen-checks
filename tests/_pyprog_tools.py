@@ -339,3 +339,11 @@ def get_function(default_name, *alternatives):
     # but we can wrap that once more.
     f = getFunction(name)
     return TestableCallable(f)
+
+def get_defined_function(default_name, *alternatives):
+    """
+    Fails the test if none of the names is defined in the module, and
+    otherwise returns the function like get_function does.
+    """
+    function_defined_in_module(default_name, *alternatives)
+    return get_function(default_name, *alternatives)
