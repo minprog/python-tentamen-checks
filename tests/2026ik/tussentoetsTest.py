@@ -18,8 +18,8 @@ def test_count_below_above (test):
     func = get_defined_function("count_below_above")
     assert no_input_output_in_function(func)
     assert func([3, 8, 5, 10, 1], 5) == [2, 2]
-    assert func([1, 2, 3], 10) in [[3, 0], [0,3]]
-    assert func([10, 20], 5) == [0, 2]
+    assert func([1, 2, 3], 10) & {(3, 0), (0, 3)}
+    assert func([10, 20], 5) & {(0, 2), (2, 0)}
     assert func([5, 5], 5) == [0, 0]
     assert func([-3, 0, 3], 0) == [1, 1]
     assert func([], 5) == [0, 0]

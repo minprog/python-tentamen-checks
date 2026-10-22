@@ -309,6 +309,19 @@ class TestableValue:
             raise AssertionError(feedback_string)
         return True
 
+    def __and__(self, options):
+        # check the original value against a set of accepted values, where
+        # a list value is compared as a tuple because sets need hashable items
+        value = tuple(self.value) if isinstance(self.value, list) else self.value
+        if value not in options:
+            accepted = ' of '.join(repr(x) for x in sorted(options))
+            raise AssertionError(
+                f"{self._function_call_repr}:\n"
+                f"  verwachtte {accepted}\n"
+                f"  maar kreeg {self.value!r}"
+            )
+        return True
+
 class TestableCallable:
     """
     Wraps a function to store name and wrap the result of a call
