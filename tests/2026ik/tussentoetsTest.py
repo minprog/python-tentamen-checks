@@ -27,7 +27,7 @@ def test_count_below_above (test):
 @test(10)
 def test_bracket_depth (test):
     """2. bracket_depth werkt correct"""
-    func = get_defined_function("bracket_depth")
+    func = get_defined_function("bracket_depth", "braket_depth")
     assert no_input_output_in_function(func)
     assert func('(a(b)c)(d)') == 2
     assert func('(()') == -1
