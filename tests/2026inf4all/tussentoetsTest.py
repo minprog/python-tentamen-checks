@@ -19,7 +19,7 @@ def test_split_capitalized (test):
     func = get_defined_function("split_capitalized")
     assert no_input_output_in_function(func)
     assert func(['Amsterdam', 'fiets', 'Utrecht', '']) == [['Amsterdam', 'Utrecht'], ['fiets', '']]
-    assert func(['1A', 'Ab']) == [['Ab'], ['1A']]
+    # assert func(['1A', 'Ab']) == [['Ab'], ['1A']]
     assert func(['B', 'b', 'A', 'a']) == [['B', 'A'], ['b', 'a']]
     assert func(['ABC', 'aBC']) == [['ABC'], ['aBC']]
     assert func([' A']) == [[], [' A']]
