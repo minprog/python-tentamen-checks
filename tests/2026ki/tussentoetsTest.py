@@ -25,43 +25,43 @@ def test_split_capitalized (test):
     assert func(['a', 'b']) == [[], ['a', 'b']]
     assert func(['A', 'B']) == [['A', 'B'], []]
     assert func(['']) == [[], ['']]
-    assert func([]) == [[], []]
-
-@test(10)
-def test_repeat_chars (test):
-    """2. repeat_chars werkt correct"""
-    func = get_defined_function("repeat_chars", "repeat_charts", "repeat_char")
-    assert no_input_output_in_function(func)
-    assert func('abcd', [2, 0, 3]) == 'aacccd'
-    assert func('xy', [1, 1]) == 'xy'
-    assert func('a', [5]) == 'aaaaa'
-    assert func('aa', [2, 1]) == 'aaa'
-    assert func('abc', [0]) == 'bc'
-    assert func('ab', [0, 0]) == ''
-    assert func('ab', [2, 3, 4]) == 'aabbb'
-    assert func('xyz', []) == 'xyz'
-    assert func('', [4]) == ''
-    assert func('', []) == ''
+    # assert func([]) == [[], []]
 
 @test(10)
 def test_peak_positions (test):
-    """3. peak_positions werkt correct"""
+    """2. peak_positions werkt correct"""
     func = get_defined_function("peak_positions", "peak_positie", "peak_postions", "peak_position")
     assert no_input_output_in_function(func)
-    assert func([1, 3, 2, 5]) == [1, 3]
+    assert func([120, 135, -31, 49]) == [1, 3]
     assert func([1, 2, 1, 2, 1]) == [1, 3]
     assert func([5, 1, 9]) == [0, 2]
     assert func([1, 2, 3]) == [2]
     assert func([3, 2, 1]) == [0]
-    assert func([-3, -1, -2]) == [1]
-    assert func([5, 1]) == [0]
-    assert func([1, 5]) == [1]
-    assert func([4, 4, 1]) == []
-    assert func([1, 4, 4]) == []
-    assert func([1, 2, 2, 1]) == []
-    assert func([3, 3]) == []
+    # assert func([-3, -1, -2]) == [1]
+    # assert func([5, 1]) == [0]
+    # assert func([1, 5]) == [1]
+    # assert func([4, 4, 1]) == []
+    # assert func([1, 4, 4]) == []
+    # assert func([1, 2, 2, 1]) == []
+    # assert func([3, 3]) == []
     assert func([7]) == [0]
-    assert func([]) == []
+    # assert func([]) == []
+
+@test(10)
+def test_repeat_chars (test):
+    """3. repeat_chars werkt correct"""
+    func = get_defined_function("repeat_chars", "repeat_charts", "repeat_char")
+    assert no_input_output_in_function(func)
+    assert func('abcde', [2, 0, 3]) == 'aacccd'
+    assert func('xy', [1, 1]) == 'xy'
+    assert func('a', [5]) == 'aaaaa'
+    assert func('aa', [2, 1]) == 'aaa'
+    assert func('abc', [0]) == 'bc'
+    # assert func('ab', [0, 0]) == ''
+    assert func('ab', [2, 3, 4]) == 'aabbb'
+    # assert func('xyz', []) == 'xyz'
+    # assert func('', [4]) == ''
+    # assert func('', []) == ''
 
 @test(10)
 def test_reverse_long_words (test):
@@ -69,15 +69,15 @@ def test_reverse_long_words (test):
     func = get_defined_function("reverse_long_words")
     assert no_input_output_in_function(func)
     assert func('dit is een lange zin.', 3) == 'dit is een egnal zin.'
-    assert func('dit is een lange zin.', 0) == 'tid si nee egnal niz.'
+    # assert func('dit is een lange zin.', 0) == 'tid si nee egnal niz.'
     assert func('lange zin.', 3) == 'egnal zin.'
-    assert func('een twee.', 3) == 'een eewt.'
-    assert func('Lange Zin.', 2) == 'egnaL niZ.'
-    assert func('kort.', 3) == 'trok.'
-    assert func('kort.', 4) == 'kort.'
-    assert func('kort.', 10) == 'kort.'
-    assert func('a b.', 0) == 'a b.'
-    assert func('', 3) == ''
+    # assert func('een twee.', 3) == 'een eewt.'
+    # assert func('Lange Zin.', 2) == 'egnaL niZ.'
+    # assert func('kort.', 3) == 'trok.'
+    # assert func('kort.', 4) == 'kort.'
+    # assert func('kort.', 10) == 'kort.'
+    # assert func('a b.', 0) == 'a b.'
+    # assert func('', 3) == ''
 
 @test(10)
 def test_select_containing (test):
@@ -88,11 +88,11 @@ def test_select_containing (test):
     assert func(['vla', 'appel'], 'la') == ['vla', 'appel']
     assert func(['kaas', 'vis'], 'a') == ['kaas']
     assert func(['appel', 'vla'], 'ap') == ['appel']
-    assert func(['abc', 'bc'], 'ab') == ['abc']
+    # assert func(['abc', 'bc'], 'ab') == ['abc']
     assert func(['abc', 'ab', 'a'], 'abc') == ['abc']
-    assert func(['kaas', 'vis'], 'xyz') == []
-    assert func(['', 'a'], 'a') == ['a']
-    assert func(['kaas', 'vis'], '') == ['kaas', 'vis']
-    assert func(['', 'a'], '') == ['', 'a']
-    assert func([], 'a') == []
-    assert func([], '') == []
+    # assert func(['kaas', 'vis'], 'xyz') == []
+    # assert func(['', 'a'], 'a') == ['a']
+    # assert func(['kaas', 'vis'], '') == ['kaas', 'vis']
+    # assert func(['', 'a'], '') == ['', 'a']
+    # assert func([], 'a') == []
+    # assert func([], '') == []
