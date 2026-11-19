@@ -16,7 +16,7 @@ forbidden_constructs.disallow_all()
 @test(10)
 def test_split_capitalized (test):
     """1. split_capitalized werkt correct"""
-    func = get_defined_function("split_capitalized")
+    func = get_defined_function("split_capitalized", "split_capatalized")
     assert no_input_output_in_function(func)
     assert func(['Amsterdam', 'fiets', 'Utrecht', '']) == [['Amsterdam', 'Utrecht'], ['fiets', '']]
     # assert func(['1A', 'Ab']) == [['Ab'], ['1A']]
@@ -83,7 +83,7 @@ def test_reverse_long_words (test):
 @test(10)
 def test_select_containing (test):
     """5. select_containing werkt correct"""
-    func = get_defined_function("select_containing")
+    func = get_defined_function("select_containing", "select_countaining")
     assert no_input_output_in_function(func)
     assert func(['kaas', 'appel', 'vla'], 'la') == ['appel', 'vla']
     assert func(['vla', 'appel'], 'la') == ['vla', 'appel']
