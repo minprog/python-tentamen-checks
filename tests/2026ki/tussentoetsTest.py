@@ -52,7 +52,7 @@ def test_repeat_chars (test):
     """3. repeat_chars werkt correct"""
     func = get_defined_function("repeat_chars", "repeat_charts", "repeat_char")
     assert no_input_output_in_function(func)
-    assert func('abcde', [2, 0, 3]) == 'aacccd'
+    assert func('abcde', [2, 0, 3]) == 'aacccde'
     assert func('xy', [1, 1]) == 'xy'
     assert func('a', [5]) == 'aaaaa'
     assert func('aa', [2, 1]) == 'aaa'
