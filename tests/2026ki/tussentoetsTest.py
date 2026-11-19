@@ -31,7 +31,7 @@ def test_split_capitalized (test):
 @test(10)
 def test_repeat_chars (test):
     """2. repeat_chars werkt correct"""
-    func = get_defined_function("repeat_chars")
+    func = get_defined_function("repeat_chars", "repeat_charts")
     assert no_input_output_in_function(func)
     assert func('abcd', [2, 0, 3]) == 'aacccd'
     assert func('xy', [1, 1]) == 'xy'
