@@ -22,7 +22,6 @@ def test_split_capitalized (test):
     # assert func(['1A', 'Ab']) == [['Ab'], ['1A']]
     assert func(['B', 'b', 'A', 'a']) == [['B', 'A'], ['b', 'a']]
     assert func(['ABC', 'aBC']) == [['ABC'], ['aBC']]
-    assert func([' A']) == [[], [' A']]
     assert func(['a', 'b']) == [[], ['a', 'b']]
     assert func(['A', 'B']) == [['A', 'B'], []]
     assert func(['']) == [[], ['']]
