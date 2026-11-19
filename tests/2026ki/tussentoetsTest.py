@@ -16,7 +16,7 @@ forbidden_constructs.disallow_all()
 @test(10)
 def test_split_capitalized (test):
     """1. split_capitalized werkt correct"""
-    func = get_defined_function("split_capitalized", "split_capatalized", "split_capitalised")
+    func = get_defined_function("split_capitalized", "split_capatalized", "split_capitalised", "slit_capitalized")
     assert no_input_output_in_function(func)
     assert func(['Amsterdam', 'fiets', 'Utrecht', '']) == [['Amsterdam', 'Utrecht'], ['fiets', '']]
     # assert func(['1A', 'Ab']) == [['Ab'], ['1A']]
