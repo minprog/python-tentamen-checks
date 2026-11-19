@@ -46,7 +46,7 @@ def test_repeat_chars (test):
 @test(10)
 def test_peak_positions (test):
     """3. peak_positions werkt correct"""
-    func = get_defined_function("peak_positions", "peak_positie", "peak_postions")
+    func = get_defined_function("peak_positions", "peak_positie", "peak_postions", "peak_positions")
     assert no_input_output_in_function(func)
     assert func([1, 3, 2, 5]) == [1, 3]
     assert func([1, 2, 1, 2, 1]) == [1, 3]
