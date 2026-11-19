@@ -31,7 +31,7 @@ def test_split_capitalized (test):
 @test(10)
 def test_repeat_chars (test):
     """2. repeat_chars werkt correct"""
-    func = get_defined_function("repeat_chars", "repeat_charts")
+    func = get_defined_function("repeat_chars", "repeat_charts", "repeat_char")
     assert no_input_output_in_function(func)
     assert func('abcd', [2, 0, 3]) == 'aacccd'
     assert func('xy', [1, 1]) == 'xy'
@@ -47,7 +47,7 @@ def test_repeat_chars (test):
 @test(10)
 def test_peak_positions (test):
     """3. peak_positions werkt correct"""
-    func = get_defined_function("peak_positions", "peak_positie")
+    func = get_defined_function("peak_positions", "peak_positie", "peak_postions")
     assert no_input_output_in_function(func)
     assert func([1, 3, 2, 5]) == [1, 3]
     assert func([1, 2, 1, 2, 1]) == [1, 3]
